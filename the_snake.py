@@ -91,6 +91,8 @@ class Apple(GameObject):
     def randomize_position(self, positions):
         """Метод randomize_position возвращает рандомную позицию яблока."""
         while True:
+            if positions is None:
+                positions = list()
             self.position = (
                 randint(0, (GRID_WIDTH - 1)) * GRID_SIZE,
                 randint(0, (GRID_HEIGHT - 1)) * GRID_SIZE
