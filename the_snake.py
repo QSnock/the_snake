@@ -70,7 +70,7 @@ class GameObject:
 class Apple(GameObject):
     """Класс Apple наследуется от GameObject и описывает яблоко."""
 
-    def __init__(self, snake_list=None):
+    def __init__(self, snake_list=list()):
         """Конструктор класса Apple."""
         super().__init__(APPLE_COLOR)
         # Устнавливаем рандомное положение яблока.
