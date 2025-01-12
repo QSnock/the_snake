@@ -189,8 +189,6 @@ def main():
         pg.display.update()  # Отрисовываем изменения.
         handle_keys(snake)
         snake.update_direction(snake.next_direction)
-        apple.draw()  # Рисуем яблоко.
-        snake.draw()  # Рисуем змейку.
         snake.move()  # Перемещаем змейку.
         if snake.get_head_position() == apple.position:
             snake.positions.append(snake.last)
@@ -199,6 +197,8 @@ def main():
             screen.fill(BOARD_BACKGROUND_COLOR)
             snake.reset()  # Сбрасываем змейку.
             apple.randomize_position(snake.positions)
+        apple.draw()  # Рисуем яблоко.
+        snake.draw()  # Рисуем змейку.
 
 
 if __name__ == '__main__':
