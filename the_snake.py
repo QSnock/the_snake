@@ -102,11 +102,10 @@ class Snake(GameObject):
         super().__init__(SNAKE_COLOR)
         self.reset()  # В методе reset() указаны начальные параметры.
 
-    def update_direction(self):
+    def update_direction(self, next_direction=None):
         """Метод обновления направления после нажатия на кнопку."""
-        if self.next_direction:
-            self.direction = self.next_direction
-            self.next_direction = None
+        if next_direction:
+            self.direction = next_direction
 
     def get_head_position(self):
         """Метод get_head_position возвращает текущее положение головы
@@ -199,7 +198,7 @@ def main():
         clock.tick(SPEED)
         pg.display.update()  # Отрисовываем изменения.
         handle_keys(snake)
-        snake.update_direction()
+        snake.update_direction(snake.next_direction)
         apple.draw()  # Рисуем яблоко.
         snake.draw()  # Рисуем змейку.
         snake.move()  # Перемещаем змейку.
