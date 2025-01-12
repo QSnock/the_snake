@@ -168,7 +168,7 @@ class Snake(GameObject):
 def handle_keys(game_object):
     """Функция обработки действий пользователя."""
     for event in pg.event.get():
-        if event.type == pg.QUIT:
+        if event.type == pg.QUIT or pg.key.get_pressed()[pg.K_ESCAPE]:
             pg.quit()
             raise SystemExit
         if event.type == pg.KEYDOWN:
