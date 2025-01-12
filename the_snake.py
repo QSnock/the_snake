@@ -75,14 +75,13 @@ class GameObject:
         рисоваться на экране объект.
         """
         raise NotImplementedError(
-            'Определите метод draw в классе %s.' % (self.__class__.__name__)
-        )
+            'Определите draw в %s.' % (self.__class__.__name__))
 
 
 class Apple(GameObject):
     """Класс Apple наследуется от GameObject и описывает яблоко."""
 
-    def __init__(self, snake_list=list()):
+    def __init__(self, snake_list=None):
         """Конструктор класса Apple."""
         super().__init__(APPLE_COLOR)
         # Устнавливаем рандомное положение яблока.
