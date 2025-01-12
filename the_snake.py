@@ -117,9 +117,7 @@ class Snake(GameObject):
         """Метод move отвечает за движение змейки, а именно:
         добавляет новую голову в начало списка и убирает последний элемент.
         """
-        self.current_head_position = self.get_head_position()
-        x_position = self.current_head_position[0]
-        y_position = self.current_head_position[1]
+        x_position, y_position = self.get_head_position()
 
         # Проверка на границу поля по оси X.
         if x_position >= SCREEN_WIDTH:
