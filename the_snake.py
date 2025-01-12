@@ -119,28 +119,13 @@ class Snake(GameObject):
         """
         x_position, y_position = self.get_head_position()
 
-        # Проверка на границу поля по оси X.
-        if x_position >= SCREEN_WIDTH:
-            x_position = - GRID_SIZE
-        elif x_position < 0:
-            x_position = SCREEN_WIDTH
+        x_direction, y_direction = self.direction
+        x_coord = (GRID_SIZE * x_direction + x_position) % SCREEN_WIDTH
+        y_coord = (GRID_SIZE * y_direction + y_position) % SCREEN_HEIGHT
 
-        # Проверка на границу поля по оси Y.
-        if y_position >= SCREEN_HEIGHT:
-            y_position = - GRID_SIZE
-        elif y_position < 0:
-            y_position = SCREEN_HEIGHT
-
-        # В зависимости от направления добавляем новую голову.
-        if self.direction == RIGHT:
-            self.positions.insert(0, (x_position + GRID_SIZE, y_position))
-        elif self.direction == LEFT:
-            self.positions.insert(0, (x_position - GRID_SIZE, y_position))
-        elif self.direction == UP:
-            self.positions.insert(0, (x_position, y_position - GRID_SIZE))
-        elif self.direction == DOWN:
-            self.positions.insert(0, (x_position, y_position + GRID_SIZE))
-        self.last = self.positions.pop()
+        self.positions.insert(0, (x_coord, y_coord))
+        if len(self.positions) > self.length:
+            self.last = self.positions.pop()
 
     def draw(self):
         """Метод draw в классе Snake
