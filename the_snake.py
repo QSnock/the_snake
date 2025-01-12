@@ -75,7 +75,7 @@ class GameObject:
         рисоваться на экране объект.
         """
         raise NotImplementedError(
-            ('Определите draw в %s.' % (self.__class__.__name__))
+            'Определите draw в {error}.'.format(error=self.__class__.__name__)
         )
 
 
