@@ -75,7 +75,8 @@ class GameObject:
         рисоваться на экране объект.
         """
         raise NotImplementedError(
-            'Определите draw в %s.' % (self.__class__.__name__))
+            ('Определите draw в %s.' % (self.__class__.__name__))
+        )
 
 
 class Apple(GameObject):
