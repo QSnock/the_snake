@@ -70,19 +70,22 @@ class GameObject:
 class Apple(GameObject):
     """Класс Apple наследуется от GameObject и описывает яблоко."""
 
-    def __init__(self):
+    def __init__(self, snake_list=None):
         """Конструктор класса Apple."""
         super().__init__(APPLE_COLOR)
         # Устнавливаем рандомное положение яблока.
-        self.position = self.randomize_position()
+        self.position = self.randomize_position(snake_list)
 
-    def randomize_position(self):
+    def randomize_position(self, positions):
         """Метод randomize_position возвращает рандомную позицию яблока."""
-        self.position = (
-            randint(0, (GRID_WIDTH - 1)) * GRID_SIZE,
-            randint(0, (GRID_HEIGHT - 1)) * GRID_SIZE
-        )
-        return self.position
+        while True:
+            self.position = (
+                randint(0, (GRID_WIDTH - 1)) * GRID_SIZE,
+                randint(0, (GRID_HEIGHT - 1)) * GRID_SIZE
+            )
+            if self.position not in positions:
+                return self.position
+                break
 
     def draw(self):
         """Метод draw в классе Apple отрисовывет яблоко на поле."""
@@ -188,8 +191,10 @@ def handle_keys(game_object):
 def main():
     """Основной цикл программы."""
     pg.init()  # Инициализация pg.
-    apple = Apple()  # Создаем яблоко.
     snake = Snake()  # Создаем змейку.
+    # Создаем яблоко, в аргумент передем лист,
+    # в котором находятся занятые ячейки.
+    apple = Apple(snake.positions)
     while True:
         clock.tick(SPEED)
         pg.display.update()  # Отрисовываем изменения.
@@ -200,7 +205,7 @@ def main():
         snake.move()  # Перемещаем змейку.
         if snake.get_head_position() == apple.position:
             snake.positions.append(snake.last)
-            apple = Apple()
+            apple = Apple(snake.positions)
         elif snake.get_head_position() in snake.positions[1:]:
             screen.fill(BOARD_BACKGROUND_COLOR)
             snake.reset()  # Сбрасываем змейку.
