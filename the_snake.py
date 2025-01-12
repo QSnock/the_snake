@@ -27,6 +27,18 @@ APPLE_COLOR = (255, 0, 0)
 # Цвет змейки.
 SNAKE_COLOR = (0, 255, 0)
 
+# Все возможные направления движения змейки
+DIRECTIONS = {
+    (pg.K_UP, LEFT): UP,
+    (pg.K_UP, RIGHT): UP,
+    (pg.K_DOWN, LEFT): DOWN,
+    (pg.K_DOWN, RIGHT): DOWN,
+    (pg.K_LEFT, UP): LEFT,
+    (pg.K_LEFT, DOWN): LEFT,
+    (pg.K_RIGHT, UP): RIGHT,
+    (pg.K_RIGHT, DOWN): RIGHT,
+}
+
 # Скорость движения змейки:
 SPEED = 20
 
@@ -135,7 +147,7 @@ class Snake(GameObject):
             self.draw_cell(position)
 
         # Отрисовка головы змейки.
-        self.draw_cell(self.positions[0])
+        self.draw_cell(self.get_head_position())
 
         # Затирание последнего сегмента.
         if self.last:
@@ -159,15 +171,10 @@ def handle_keys(game_object):
         if event.type == pg.QUIT:
             pg.quit()
             raise SystemExit
-        elif event.type == pg.KEYDOWN:
-            if event.key == pg.K_UP and game_object.direction != DOWN:
-                game_object.next_direction = UP
-            elif event.key == pg.K_DOWN and game_object.direction != UP:
-                game_object.next_direction = DOWN
-            elif event.key == pg.K_LEFT and game_object.direction != RIGHT:
-                game_object.next_direction = LEFT
-            elif event.key == pg.K_RIGHT and game_object.direction != LEFT:
-                game_object.next_direction = RIGHT
+        if event.type == pg.KEYDOWN:
+            game_object.next_direction = DIRECTIONS.get(
+                (event.key, game_object.direction)
+            )
 
 
 def main():
@@ -191,6 +198,7 @@ def main():
         elif snake.get_head_position() in snake.positions[1:]:
             screen.fill(BOARD_BACKGROUND_COLOR)
             snake.reset()  # Сбрасываем змейку.
+            apple.randomize_position(snake.positions)
 
 
 if __name__ == '__main__':
