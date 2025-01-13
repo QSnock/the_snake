@@ -82,24 +82,23 @@ class GameObject:
 class Apple(GameObject):
     """Класс Apple наследуется от GameObject и описывает яблоко."""
 
-    def __init__(self, snake_list=None):
+    def __init__(self, color=APPLE_COLOR, occupied_cells=None):
         """Конструктор класса Apple."""
-        super().__init__(APPLE_COLOR)
+        super().__init__(color)
+        if occupied_cells is None:
+            occupied_cells = []
         # Устнавливаем рандомное положение яблока.
-        self.position = self.randomize_position(snake_list)
+        self.position = self.randomize_position(occupied_cells)
 
-    def randomize_position(self, positions):
+    def randomize_position(self, occupied_cells):
         """Метод randomize_position возвращает рандомную позицию яблока."""
         while True:
-            if positions is None:
-                positions = list()
             self.position = (
                 randint(0, (GRID_WIDTH - 1)) * GRID_SIZE,
                 randint(0, (GRID_HEIGHT - 1)) * GRID_SIZE
             )
-            if self.position not in positions:
+            if self.position not in occupied_cells:
                 return self.position
-                break
 
     def draw(self):
         """Метод draw в классе Apple отрисовывет яблоко на поле."""
@@ -111,9 +110,9 @@ class Snake(GameObject):
     и ее движения.
     """
 
-    def __init__(self):
+    def __init__(self, color=SNAKE_COLOR):
         """Конструктор класса Snake."""
-        super().__init__(SNAKE_COLOR)
+        super().__init__(color)
         self.reset()  # В методе reset() указаны начальные параметры.
 
     def update_direction(self, next_direction=None):
@@ -138,8 +137,9 @@ class Snake(GameObject):
         y_coord = (GRID_SIZE * y_direction + y_position) % SCREEN_HEIGHT
 
         self.positions.insert(0, (x_coord, y_coord))
-        if len(self.positions) > self.length:
-            self.last = self.positions.pop()
+        self.last = (
+            self.positions.pop() if len(self.positions) > self.length else None
+        )
 
     def draw(self):
         """Метод draw в классе Snake
@@ -185,7 +185,7 @@ def main():
     snake = Snake()  # Создаем змейку.
     # Создаем яблоко, в аргумент передем лист,
     # в котором находятся занятые ячейки.
-    apple = Apple(snake.positions)
+    apple = Apple(occupied_cells=snake.positions)
     while True:
         clock.tick(SPEED)
         pg.display.update()  # Отрисовываем изменения.
@@ -194,7 +194,7 @@ def main():
         snake.move()  # Перемещаем змейку.
         if snake.get_head_position() == apple.position:
             snake.positions.append(snake.last)
-            apple = Apple(snake.positions)
+            apple = Apple(occupied_cells=snake.positions)
         elif snake.get_head_position() in snake.positions[1:]:
             screen.fill(BOARD_BACKGROUND_COLOR)
             snake.reset()  # Сбрасываем змейку.
