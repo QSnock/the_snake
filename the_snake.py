@@ -1,4 +1,9 @@
-# Импортируем нужные нам библиотеки.
+"""Классическая игра "Змейка" на Python с использованием Pygame.
+
+Этот модуль содержит полную реализацию игры "Змейка" с объектно-ориентированным
+подходом, красивым меню и системой сохранения результатов.
+"""
+
 from random import randint, choice
 
 import pygame as pg
@@ -62,14 +67,17 @@ clock = pg.time.Clock()
 
 # Тут опишите все классы игры.
 class GameObject:
-    """Базовый класс GameObject, от этого класса наследуются другие игровые
-    объекты, в нашем случае Eat и Snake.
+    """Базовый класс для игровых объектов.
+
+    От этого класса наследуются другие игровые объекты, в нашем случае
+    Eat и Snake. Предоставляет базовую функциональность для отрисовки
+    и управления игровыми объектами.
     """
 
     def __init__(self, color=None):
         """Конструктор класса GameObject."""
-        self.position = None  # Позиция объекта (по умолчанию - None).
-        self.body_color = color  # Цвет объекта.
+        self.position = None
+        self.body_color = color
 
     def draw_cell(self, position):
         """Отрисовывает одну ячейку поля."""
@@ -78,9 +86,10 @@ class GameObject:
         pg.draw.rect(screen, BORDER_COLOR, rect, 1)
 
     def draw(self):
-        """Метод draw класса GameObject служит для переопределения
-        в дочерних классах. Этот метод должен определять, как будет
-        рисоваться на экране объект.
+        """Абстрактный метод для отрисовки объекта.
+
+        Служит для переопределения в дочерних классах.
+        Этот метод должен определять, как будет рисоваться на экране объект.
         """
         raise NotImplementedError(
             'Определите draw в {error}.'.format(error=self.__class__.__name__)
@@ -88,7 +97,11 @@ class GameObject:
 
 
 class Eat(GameObject):
-    """Класс Eat наследуется от GameObject и описывает яблоко."""
+    """Класс для еды в игре.
+
+    Наследуется от GameObject и описывает еду, которую может съесть змейка.
+    Включает яблоко, банан и апельсин с разными цветами.
+    """
 
     def __init__(self, color, occupied_cells=None):
         """Конструктор класса Eat."""
@@ -99,7 +112,14 @@ class Eat(GameObject):
         self.position = self.randomize_position(occupied_cells)
 
     def randomize_position(self, occupied_cells):
-        """Метод randomize_position возвращает рандомную позицию яблока."""
+        """Возвращает случайную позицию для еды.
+
+        Args:
+            occupied_cells (list): Список занятых позиций.
+
+        Returns:
+            tuple: Координаты (x, y) для размещения еды.
+        """
         while True:
             self.position = (
                 randint(0, (GRID_WIDTH - 1)) * GRID_SIZE,
@@ -109,34 +129,44 @@ class Eat(GameObject):
                 return self.position
 
     def draw(self):
-        """Метод draw в классе Eat отрисовывет яблоко на поле."""
+        """Отрисовывает еду на игровом поле."""
         self.draw_cell(self.position)
 
 
 class Snake(GameObject):
-    """Класс Snake наследуется от GameObject и описывает змейку
-    и ее движения.
+    """Класс для управления змейкой.
+
+    Наследуется от GameObject и описывает змейку и ее движения.
+    Включает логику движения, роста и столкновений.
     """
 
     def __init__(self, color=SNAKE_COLOR):
         """Конструктор класса Snake."""
         super().__init__(color)
-        self.reset()  # В методе reset() указаны начальные параметры.
+        self.reset()
 
     def update_direction(self, next_direction=None):
-        """Метод обновления направления после нажатия на кнопку."""
+        """Обновляет направление движения змейки.
+
+        Args:
+            next_direction (tuple, optional): Новое направление движения.
+        """
         if next_direction:
             self.direction = next_direction
 
     def get_head_position(self):
-        """Метод get_head_position возвращает текущее положение головы
-        змейки.
+        """Возвращает текущее положение головы змейки.
+
+        Returns:
+            tuple: Координаты головы змейки (x, y).
         """
         return self.positions[0]
 
     def move(self):
-        """Метод move отвечает за движение змейки, а именно:
-        добавляет новую голову в начало списка и убирает последний элемент.
+        """Перемещает змейку в новом направлении.
+
+        Добавляет новую голову в начало списка и убирает последний элемент.
+        Обеспечивает плавное движение змейки по игровому полю.
         """
         x_position, y_position = self.get_head_position()
 
@@ -150,23 +180,23 @@ class Snake(GameObject):
         )
 
     def draw(self):
-        """Метод draw в классе Snake
-        отрисовывет нашу змейку, и затирает след.
+        """Отрисовывает змейку на игровом поле.
+
+        Рисует все сегменты змейки и затирает след от движения.
         """
         for position in self.positions[:-1]:
             self.draw_cell(position)
 
-        # Отрисовка головы змейки.
         self.draw_cell(self.get_head_position())
 
-        # Затирание последнего сегмента.
         if self.last:
             last_rect = pg.Rect(self.last, (GRID_SIZE, GRID_SIZE))
             pg.draw.rect(screen, BOARD_BACKGROUND_COLOR, last_rect)
 
     def reset(self):
-        """Сбрасывает змейку в начальное состояние после столкновения
-        с собой.
+        """Сбрасывает змейку в начальное состояние.
+
+        Вызывается после столкновения с собой или при начале новой игры.
         """
         self.length = 1
         self.positions = [(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)]
@@ -176,25 +206,38 @@ class Snake(GameObject):
 
 
 class Score(GameObject):
-    """Счетчик, увеличивается при съедании еды, сбрасывается при проигрыше."""
+    """Класс для управления счетом в игре.
+
+    Счетчик увеличивается при съедании еды и сбрасывается при проигрыше.
+    Отображает текущий счет на экране.
+    """
 
     def __init__(self, score):
+        """Инициализация счетчика.
+
+        Args:
+            score (int): Начальное значение счета.
+        """
         self.score = score
-        self.font = pg.font.SysFont('robo', 35)
+        self.font = pg.font.SysFont('arial', 35)
 
     def draw(self):
-        """Метод отрисовывает счетчик."""
+        """Отрисовывает счет на экране."""
         self.score_panel = self.font.render(
             f'Счет: {str(self.score)}',
             True,
             SCORE_COLOR
         )
-        score_rect = self.score_panel.get_rect(center=(700, 30))
+        score_rect = self.score_panel.get_rect(center=(100, 30))
         screen.blit(self.score_panel, score_rect)
 
 
 def handle_keys(game_object):
-    """Функция обработки действий пользователя."""
+    """Обрабатывает нажатия клавиш пользователем.
+
+    Args:
+        game_object: Игровой объект для управления (обычно змейка).
+    """
     for event in pg.event.get():
         if event.type == pg.QUIT or pg.key.get_pressed()[pg.K_ESCAPE]:
             pg.quit()
@@ -205,44 +248,79 @@ def handle_keys(game_object):
             )
 
 
+def load_score():
+    """Загружает предыдущий счет из файла.
+
+    Returns:
+        str: Предыдущий счет или "0" если файл не существует.
+    """
+    try:
+        with open('score.txt', 'r') as f:
+            return f.read().strip()
+    except FileNotFoundError:
+        return "0"
+
+
+def save_score(score):
+    """Сохраняет счет в файл.
+
+    Args:
+        score (int): Счет для сохранения.
+    """
+    with open('score.txt', 'w') as f:
+        f.write(str(score))
+
+
 menu = pgm.Menu('Добро пожаловать!', 500, 400, theme=pgm.themes.THEME_DARK)
 
 
 def start_the_game():
-    """Основной цикл программы."""
-    snake = Snake()  # Создаем змейку.
-    # Создаем еду, в аргумент передем лист,
-    # в котором находятся занятые ячейки.
+    """Основной игровой цикл программы.
+
+    Управляет игровым процессом, включая движение змейки,
+    обработку столкновений и обновление счета.
+    """
+    snake = Snake()
     eat = Eat(choice(EAT), occupied_cells=snake.positions)
-    score = Score(0)  # Создаем счетчик.
-    screen.fill(BOARD_BACKGROUND_COLOR)  # Закрашиваем экран.
+    score = Score(0)
+    screen.fill(BOARD_BACKGROUND_COLOR)
     while True:
         clock.tick(SPEED)
-        pg.display.update()  # Отрисовываем изменения.
+        pg.display.update()
         handle_keys(snake)
         snake.update_direction(snake.next_direction)
-        snake.move()  # Перемещаем змейку.
+        snake.move()
         if snake.get_head_position() == eat.position:
             score.score += 1
             snake.positions.append(snake.last)
             eat = Eat(choice(EAT), occupied_cells=snake.positions)
-            screen.fill(BOARD_BACKGROUND_COLOR)  # Закрашиваем экран.
+            screen.fill(BOARD_BACKGROUND_COLOR)
         elif snake.get_head_position() in snake.positions[1:]:
             break
-        eat.draw()  # Рисуем еду.
-        snake.draw()  # Рисуем змейку.
-        score.draw()  # Отрисовываем счетчик.
+        eat.draw()
+        snake.draw()
+        score.draw()
 
-    # Запишем последний результат.
-    with open('score.txt', 'w') as f:
-        f.write(str(score.score))
+    save_score(score.score)
+
+    global menu
+    menu.clear()
+    menu.add.text_input('Имя Игрока :', default='Игрок')
+    menu.add.label(title=f"Предыдущий результат: {score.score}")
+    menu.add.button('Играть', start_the_game)
+    menu.add.button('Выход', pgm.events.EXIT)
+    menu.add.range_slider(
+        'Выберите скорость', 20, (5, 30), 1,
+        rangeslider_id='range_slider',
+        value_format=lambda x: str(int(x))
+    )
 
 
 if __name__ == '__main__':
 
-    with open('score.txt', 'r') as f:
-        score_data = f.read()
+    score_data = load_score()
 
+    menu = pgm.Menu('Добро пожаловать!', 500, 400, theme=pgm.themes.THEME_DARK)
     menu.add.text_input('Имя Игрока :', default='Игрок')
     menu.add.label(title=f"Предыдущий результат: {score_data}")
     menu.add.button('Играть', start_the_game)
